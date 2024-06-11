@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="cart-icon" onclick="window.location.href='cart.html'">
+    <img src="https://png.pngtree.com/element_our/20190531/ourmid/pngtree-shopping-cart-convenient-icon-image_1287807.jpg" alt="Cart" width="50">
+    <div class="cart-count" id="cart-count">0</div>
+  </div>
+
+  <div id="products">
+    <!-- Products will be rendered here -->
+  </div>
+
+  <script src="cart.js"></script>
+  <script>
+    const products = [
+      { id: 'gid://shopify/ProductVariant/45613763199200', name: 'Man Walks On Moon Framed Front Page Poster', img: 'https://cdn.shopify.com/s/files/1/0680/3456/0224/files/mockup-96e08ff3.png?v=1716336820' },
+      { id: 'gid://shopify/ProductVariant/45613753991392', name: 'I Appreciate The Muppets Onion Headline T-Shirt', img: 'https://cdn.shopify.com/s/files/1/0680/3456/0224/files/mockup-69d412e5.jpg?v=1716336770' },
+      { id: 'gid://shopify/ProductVariant/45613756612832', name: 'The Onions Classic Logo T-Shirt', img: 'https://cdn.shopify.com/s/files/1/0680/3456/0224/files/mockup-7377733f.png?v=1716336784' }
+    ];
+
+    const productsContainer = document.getElementById('products');
+
+    products.forEach(product => {
+      const productDiv = document.createElement('div');
+      productDiv.className = 'product';
+      productDiv.innerHTML = `
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <button class="add-to-cart-button" data-id="${product.id}">Add to Cart</button>
+      `;
+      productsContainer.appendChild(productDiv);
+    });
+
+    document.querySelectorAll('.add-to-cart-button').forEach(button => {
+      button.addEventListener('click', async (event) => {
+        const variantId = event.target.getAttribute('data-id');
+        await shopifyCart.addItem(variantId, 1);
+      });
+    });
+
+    updateCartCount();
+
+  </script>
+</body>
+</html>

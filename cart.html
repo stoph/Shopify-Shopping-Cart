@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="cart-icon" onclick="window.location.href='cart.html'">
+    <img src="https://png.pngtree.com/element_our/20190531/ourmid/pngtree-shopping-cart-convenient-icon-image_1287807.jpg" alt="Cart" width="50">
+    <div class="cart-count" id="cart-count">0</div>
+  </div>
+
+  <h1>Shopping Cart</h1>
+  <div id="cart-items">
+    <!-- Cart items will be rendered here -->
+  </div>
+  <div class="cart-actions">
+    <button onclick="window.location.href='products.html'">Continue Shopping</button>
+    <button id="checkout-button">Checkout</button>
+  </div>
+
+  <script src="cart.js"></script>
+  <script>
+    async function loadCart() {
+      const cartItems = await shopifyCart.listItems();
+      console.log(cartItems);
+      const cartItemsContainer = document.getElementById('cart-items');
+      cartItemsContainer.innerHTML = '';
+
+      cartItems.data.cart.lines.edges.forEach(line => {
+        const item = line.node;
+        const productDiv = document.createElement('div');
+        productDiv.className = 'cart-item';
+        productDiv.innerHTML = `
+          <img src="${item.merchandise.image.src}" alt="${item.merchandise.product.title}">
+          <div>
+            <h3>${item.merchandise.product.title}</h3>
+            <p>${item.merchandise.title}</p>
+            <p>Quantity: <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.id}', this.value)"></p>
+          </div>
+          <button onclick="removeFromCart('${item.id}')">Remove</button>
+        `;
+        cartItemsContainer.appendChild(productDiv);
+      });
+    }
+
+    async function updateQuantity(lineId, quantity) {
+      await shopifyCart.updateItem(lineId, quantity);
+      loadCart();
+    }
+
+    async function removeFromCart(lineId) {
+      await shopifyCart.removeItem(lineId);
+      loadCart();
+    }
+
+    document.getElementById('checkout-button').onclick = async () => {
+      const checkoutUrl = await shopifyCart.getCheckoutUrl();
+      window.location.href = checkoutUrl;
+    };
+
+    loadCart();
+    updateCartCount();
+  </script>
+</body>
+</html>
